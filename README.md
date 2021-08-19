@@ -14,7 +14,7 @@ in this repositori there are differents exercices using the api rest technologie
 * wordpress-api-rest
 
 # Stripe payment gateway api
-![Stripe](https://github.com/CarlosDev88/API-rest-in-javaScript/blob/main/screenshots/stripe2.png)
+
 ![Stripe](https://github.com/CarlosDev88/API-rest-in-javaScript/blob/main/screenshots/stripe1.gif)
 
 # pokemon-api
