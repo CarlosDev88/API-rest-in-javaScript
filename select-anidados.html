@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Selects anidados</title>
+  </head>
+  <body>
+    <h1>Selects Anidados</h1>
+    <h2>Colombia</h2>
+    <label for="select-primary">Departamentos</label>
+    <select name="primary" id="select-primary">
+      <option value="">Elegir un Departamento</option>
+    </select>
+    <p></p>
+
+    <label for="select-secondary">Municipios</label>
+    <select name="secondary" id="select-secondary">
+      <option value="">Elegir un Municipio</option>
+    </select>
+    <p></p>
+
+    <script>
+      const d = document,
+        $selectPrimary = d.getElementById("select-primary"),
+        $selectSecondary = d.getElementById("select-secondary");
+
+      function loadState() {
+        fetch("./assets/colombia-json-master/colombia.json")
+          .then((res) => (res.ok ? res.json() : Promise.reject(res)))
+          .then((json) => {
+            console.log(json);
+
+            let $options = `<option value="">Elegir un Departamento</option>`;
+
+            json.forEach((el) => {
+              $options += `
+                     <option value="${el.departamento}">${el.departamento}</option>
+                 `;
+            });
+
+            $selectPrimary.innerHTML = $options;
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+
+      function loadTowns(state) {
+        fetch("./assets/colombia-json-master/colombia.json")
+          .then((res) => (res.ok ? res.json() : Promise.reject(res)))
+          .then((json) => {
+            let $options = `<option value="">Elegir un Municipio</option>`;
+
+            json.forEach((el) => {
+              if (el.departamento === state) {
+                const ciudades = el.ciudades;
+                ciudades.forEach((ciudad) => {
+                  $options += `
+                     <option value="${ciudad}">${ciudad}</option>
+                 `;
+                });
+              }
+            });
+
+            $selectSecondary.innerHTML = $options;
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+
+      d.addEventListener("DOMContentLoaded", loadState());
+
+      $selectPrimary.addEventListener("change", (e) =>
+        loadTowns(e.target.value)
+      );
+    </script>
+  </body>
+</html>

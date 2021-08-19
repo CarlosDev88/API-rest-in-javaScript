@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Buscador de Canciones</title>
+    <style>
+      html {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      }
+      main {
+        display: flex;
+        flex-direction: column-reverse;
+      }
+
+      img {
+        max-width: 100%;
+        height: auto;
+      }
+      .loader {
+        display: none;
+        margin: auto;
+      }
+
+      @media screen and (min-width: 800px) {
+        main {
+          flex-direction: row;
+        }
+
+        main > * {
+          padding: 1rem;
+          flex-basis: 50%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Buscador de canciones</h1>
+
+    <form id="song-search">
+      <input
+        type="text"
+        name="artist"
+        placeholder="Nombre del interprete"
+        required
+      />
+      <br />
+      <input
+        type="text"
+        name="song"
+        placeholder="Nombre de la Canción"
+        required
+      />
+      <br />
+      <input type="submit" />
+    </form>
+    <img class="loader" src="./assets/loader.svg" alt="loader" />
+    <aside class="error"></aside>
+    <main>
+      <article class="artist">
+        <h2>Información del Artista</h2>
+      </article>
+      <article class="song">
+        <h2>Letra de la Canción</h2>
+      </article>
+    </main>
+
+    <script>
+      const d = document,
+        $form = d.getElementById("song-search"),
+        $loader = d.querySelector(".loader"),
+        $error = d.querySelector(".error"),
+        $main = d.querySelector("main"),
+        $artist = d.querySelector(".artist"),
+        $song = d.querySelector(".song");
+
+      $form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        try {
+          $loader.style.display = "block";
+
+          let artist = e.target.artist.value,
+            song = e.target.song.value,
+            $songTemplate = "",
+            $artistTemplate = "",
+            artistAPI = `https://www.theaudiodb.com/api/v1/json/1/search.php?s=${artist}`,
+            songAPI = `https://api.lyrics.ovh/v1/${artist}/${song}`,
+            artisFetch = fetch(artistAPI),
+            songFetch = fetch(songAPI),
+            [artistRes, songRes] = await Promise.all([artisFetch, songFetch]),
+            artisData = await artistRes.json(),
+            songData = await songRes.json();
+
+          if (artisData.artis === null) {
+            $artistTemplate = `<h2>No existe el artista ${artist}</h2>`;
+          } else {
+            let artist = artisData.artis[0];
+            $artistTemplate = `
+            <h2> ${artist.strArti}</h2>
+            <img src="${artist.strArtiThumb}">
+            `;
+          }
+
+          //
+        } catch (err) {
+          // console.log(err);
+          $loader.style.display = "none";
+          let message = err.statusText || "Ocurrio un Error";
+          $error.innerHTML = `<p>Error ${err.status}: ${message}</p>`;
+        }
+      });
+    </script>
+  </body>
+</html>

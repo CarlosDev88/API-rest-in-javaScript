@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Buscador de Shows de TV</title>
+    <style>
+      html {
+        text-align: center;
+      }
+      .loader {
+        display: block;
+        margin: auto;
+      }
+
+      .grid-fluid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Buscador de shows de tv</h1>
+    <input type="search" id="search" placeholder="Buscar Shows de TV" />
+    <section id="shows" class="grid-fluid"></section>
+
+    <template id="show-template">
+      <article class="show">
+        <h3></h3>
+        <div></div>
+        <img />
+        <a></a>
+      </article>
+    </template>
+
+    <script>
+      const d = document,
+        $shows = d.getElementById("shows"),
+        $template = d.getElementById("show-template").content,
+        $fragment = d.createDocumentFragment();
+
+      d.addEventListener("keypress", async (e) => {
+        if (e.target.matches("#search")) {
+          if (e.key === "Enter") {
+            try {
+              $shows.innerHTML = ` <img class="loader" src="./assets/loader.svg" alt="loader...">`;
+
+              let busqueda = e.target.value.toLowerCase(),
+                api = `https://api.tvmaze.com/search/shows?q=${busqueda}`,
+                res = await fetch(api),
+                show = await res.json();
+              //console.log(show);
+
+              if (!res.ok)
+                throw { status: res.status, statusText: res.statusText };
+
+              if (show.length === 0) {
+                $shows.innerHTML = `<h2>NO existen resultados de shows para el critero de busqueda 
+                    <mark>${busqueda}</mark> </h2>`;
+              } else {
+                show.forEach((el) => {
+                  $template.querySelector("h3").textContent = el.show.name;
+                  $template.querySelector("div").innerHTML = el.show.summary
+                    ? el.show.summary
+                    : "Sin descripción";
+
+                  $template.querySelector("img").src = el.show.image
+                    ? el.show.image.medium
+                    : "Sin Imagen";
+
+                  $template.querySelector("img").alt = el.show.name;
+                  $template.querySelector("img").style.maxWidth = "100%";
+                  $template.querySelector("a").href = el.show.url
+                    ? el.show.url
+                    : "#";
+                  $template.querySelector("a").target = el.show.url
+                    ? "_blank"
+                    : "_self";
+                  $template.querySelector("a").textContent = el.show.url
+                    ? "Ver mas.."
+                    : "";
+
+                  let $clone = d.importNode($template, true);
+                  $fragment.appendChild($clone);
+                });
+
+                $shows.innerHTML = "";
+                $shows.appendChild($fragment);
+              }
+            } catch (err) {
+              console.error(err);
+              let message = err.statusText || "Ocurrio Un Error";
+              $shows.innerHTML = `<p>Error ${error.status}: ${message}</p>`;
+            }
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
