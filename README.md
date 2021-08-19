@@ -1,5 +1,5 @@
 # API-rest-in-javaScript
-in this repositori there are differents exercices using the api rest technologie en javascript those exercises are:
+in this repositori there are differents exercices using the api rest technologie in javascript those exercises are:
 * ajax-crud
 * axios-crud
 * fetch-crud
